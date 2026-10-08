@@ -244,8 +244,8 @@ tbody tr:nth-child(even):hover td{background:#f1f5f9}
 
 /* PAYMENT CARDS */
 .pay-list{display:flex;flex-direction:column;gap:10px;contain:layout style}
-.mobile-view{display:none}
-.desktop-view{display:block}
+.mobile-view{display:flex;flex-direction:column;gap:10px}
+.desktop-view{display:none}
 @media(max-width:768px){
   .mobile-view{display:flex;flex-direction:column;gap:10px}
   .desktop-view{display:none}
@@ -1016,21 +1016,16 @@ function renderTable(tab) {
       </tr>`;
     }
 
+    // Card view is used on ALL devices (desktop & mobile) for every tab
     if (tab === 'payments') {
       const cards = rows.map(cardPayments).join('');
-      const tableRows = rows.map(rowPayments).join('');
-      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('payments',this)"></th><th>Name</th><th>Amount</th><th>Month</th><th>Status</th></tr>`;
-      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div>`;
     } else if (tab === 'formality') {
       const cards = rows.map(cardFormality).join('');
-      const tableRows = rows.map(rowFormality).join('');
-      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('formality',this)"></th><th>Name</th><th>Address</th><th>Deno</th><th>Status</th></tr>`;
-      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div>`;
     } else if (tab === 'default') {
       const cards = rows.map(cardDefault).join('');
-      const tableRows = rows.map(rowDefault).join('');
-      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('default',this)"></th><th>Name</th><th>Month</th><th>Days</th><th>Deno</th><th>Address</th></tr>`;
-      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div>`;
     }
 
     syncBulk(tab);
