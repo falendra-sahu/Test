@@ -1,1 +1,2000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#1e3a5f">
+<title>DOP Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --navy:#1e3a5f; --blue:#2563eb; --sky:#e8f0fe;
+  --green:#10b981; --accent:#f59e0b; --red:#ef4444;
+  --surface:#fff; --bg:#f0f4f8; --border:#e2e8f0;
+  --text:#1e293b; --muted:#64748b;
+  --shadow:0 4px 24px rgba(30,58,95,.10);
+  --shadow-lg:0 12px 40px rgba(30,58,95,.18);
+  --r:14px; --rs:8px;
+  --font:'DM Sans',sans-serif; --fh:'Space Grotesk',sans-serif;
+  --nb:0px;
+}
+@media(max-width:768px){:root{--nb:76px}}
+*,*::before,*::after{
+  box-sizing:border-box;margin:0;padding:0;
+  -webkit-tap-highlight-color: transparent;
+}
+html{scroll-behavior:smooth;will-change:scroll-position}
+html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--text);overscroll-behavior-y:contain;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
+.app{display:flex;flex-direction:column;height:100%;max-width:1200px;margin:0 auto}
+@media(min-width:769px){.app{padding:24px;gap:20px}}
+
+/* HEADER */
+.header{background:var(--navy);padding:18px 20px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;transition:padding .2s ease-out}
+@media(min-width:769px){.header{border-radius:var(--r);padding:20px 28px}}
+.hbrand{display:flex;align-items:center;gap:12px}
+.hicon{width:40px;height:40px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.hicon i{color:#fff;font-size:16px}
+.htitle{font-family:var(--fh);font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.hsub{font-size:11px;color:rgba(255,255,255,.5);font-weight:500;text-transform:uppercase;letter-spacing:.8px;margin-top:1px}
+.dtabs{display:none;background:rgba(255,255,255,.08);border-radius:10px;padding:4px;gap:2px}
+@media(min-width:769px){.dtabs{display:flex}}
+.dtab{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s ease-out,color .15s ease-out;border:none;background:none;font-family:var(--font);will-change:background,color}
+.dtab.active{background:var(--blue);color:#fff}
+.dtab:not(.active):hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px;padding-bottom:calc(20px + var(--nb));scroll-behavior:smooth;contain:layout style;will-change:scroll-position;-webkit-overflow-scrolling:touch}
+@media(min-width:769px){.content{background:var(--surface);border-radius:var(--r);padding:28px 32px;box-shadow:var(--shadow)}}
+
+/* PAGES */
+.page{display:none;animation:fadeIn 0.25s ease both;contain:layout style paint}
+.page.active{display:block}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* HOME */
+.hgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+@media(max-width:768px){.hgrid{grid-template-columns:repeat(2,1fr);gap:10px}}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px 18px;cursor:pointer;transition:transform .15s ease-out,box-shadow .15s ease-out;position:relative;overflow:hidden;will-change:transform,box-shadow;contain:layout paint}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ca,var(--blue));will-change:transform}
+.scard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.scard:active{transform:scale(0.98);transition-duration:.08s}
+.scard[data-tab=payments]{--ca:var(--blue)}
+.scard[data-tab=formality]{--ca:var(--green)}
+.scard[data-tab=default]{--ca:var(--accent)}
+.sc-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.sc-val{font-family:var(--fh);font-size:40px;font-weight:700;color:var(--text);line-height:1}
+.sc-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:38px;opacity:.06}
+.home-rec{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+@media(min-width:769px){.home-rec{border-top:1px solid var(--border);border-radius:0 0 var(--r) var(--r)}}
+.rec-head{padding:14px 20px;border-bottom:1px solid var(--border)}
+.rec-title{font-family:var(--fh);font-size:14px;font-weight:700}
+.rec-list{padding:6px 0}
+.rec-item{padding:11px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f8fafc;transition:background .15s ease-out}
+.rec-item:hover{background:#fafbff}
+.rec-item:last-child{border-bottom:none}
+.rec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rec-name{font-size:14px;font-weight:600}
+.rec-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.rec-badge{margin-left:auto;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.bb{background:var(--sky);color:var(--blue)}
+.bg{background:#d1fae5;color:var(--green)}
+.ba{background:#fef3c7;color:#d97706}
+.empty-home{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px}
+
+/* TOOLBAR & SUMMARY */
+.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+.tsummary{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
+.ts-box{background:#f8fafc;border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;position:relative;overflow:hidden;}
+.ts-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ts-accent,var(--blue));}
+.ts-box.ts-collect{--ts-accent:var(--blue)}
+.ts-box.ts-cash{--ts-accent:var(--green)}
+.ts-box.ts-online{--ts-accent:#8b5cf6}
+.ts-box.ts-out{--ts-accent:var(--red)}
+.ts-box.ts-pending{--ts-accent:var(--accent)}
+.ts-box.ts-done{--ts-accent:var(--green)}
+.ts-box.ts-prog{--ts-accent:var(--accent)}
+.ts-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.ts-row{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
+.ts-count{font-size:22px;font-weight:700;font-family:var(--fh);color:var(--text);line-height:1;}
+.ts-sep{font-size:12px;color:var(--muted);font-weight:600;}
+.ts-amt{font-size:13px;font-weight:700;color:var(--muted);font-family:var(--fh);}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.sw{flex:1;min-width:150px;position:relative}
+.sw i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+.sinput{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-family:var(--font);background:var(--surface);color:var(--text);transition:border-color .15s}
+.sinput:focus{outline:none;border-color:var(--blue)}
+.sinput-select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%20fill%3D%22%2364748b%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 10px center; padding-right: 30px; appearance:none; }
+.btn{padding:10px 16px;border-radius:var(--rs);border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:transform 0.08s ease-out,background 0.15s ease-out;white-space:nowrap;will-change:transform}
+.btn:active{transform:scale(0.95);transition-duration:.05s}
+.btn-p{background:var(--blue);color:#fff}
+.btn-p:hover{background:#1d4ed8}
+.btn-d{background:#fee2e2;color:var(--red);border:1px solid #fecaca}
+.btn-d:hover{background:#fecaca}
+.btn-g{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-g:hover{background:var(--bg)}
+.hidden{display:none!important}
+.sec-title{font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:3px}
+.sec-sub{font-size:13px;color:var(--muted);margin-bottom:0}
+
+/* TABLE */
+.tbox{border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.twrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead{background:#f8fafc}
+th{padding:12px 14px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);border-bottom:1px solid var(--border);border-right:1px solid #e2e8f0;white-space:nowrap;cursor:pointer;user-select:none;}
+th:first-child,th:nth-child(2){text-align:left}
+th:last-child{border-right:none}
+th:hover { background-color: #f1f5f9; }
+td{padding:13px 14px;border-bottom:1px solid #f1f5f9;border-right:1px solid #e2e8f0;color:var(--text);vertical-align:middle;transition:background 0.15s;text-align:center}
+td:first-child,td:nth-child(2){text-align:left}
+td:last-child{border-right:none}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fafbff;cursor:pointer}
+tbody tr:nth-child(even) td{background:#f8fafc}
+tbody tr:nth-child(even):hover td{background:#f1f5f9}
+.cbc{width:36px;cursor:default;display:none}
+.cbc:hover{background:none;}
+.rcb{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;display:none}
+.pay-select .cbc{display:table-cell}
+.pay-select .cbc .rcb{display:block}
+.pay-select .pay-cb{display:block}
+.sb{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.s-cash{background:#d1fae5;color:#065f46}
+.s-online{background:#dbeafe;color:#1e40af}
+.s-out{background:#fee2e2;color:#991b1b}
+.s-prog{background:#fef3c7;color:#92400e}
+.s-done{background:#d1fae5;color:#065f46}
+.s-other{background:#f1f5f9;color:#475569}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty i{font-size:38px;opacity:.2;margin-bottom:10px;display:block}
+.empty p{font-size:15px}
+
+/* MOBILE NAV */
+.mnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:100;will-change:transform}
+@media(max-width:768px){.mnav{display:flex}}
+.mni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:var(--font);transition:color .15s ease-out}
+.mni i{font-size:20px;transition:transform .15s ease-out;will-change:transform}
+.mni span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.mni.active{color:var(--blue)}
+.mni.active i{transform:translateY(-2px)}
+
+/* MODALS */
+.mbk{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;will-change:opacity}
+#cbk{z-index:300;}
+.mbk.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);width:100%;max-width:560px;box-shadow:var(--shadow-lg);overflow:hidden;animation:su .2s cubic-bezier(.4,0,.2,1);will-change:transform,opacity;contain:layout paint}
+@keyframes su{from{transform:translateY(16px) scale(0.98);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.mhd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafbff}
+.mtitle{font-family:var(--fh);font-size:16px;font-weight:700}
+.mclose{background:none;border:none;cursor:pointer;color:var(--muted);font-size:22px;padding:2px 8px;border-radius:6px;line-height:1;transition:background 0.2s;}
+.mclose:hover{background:var(--bg)}
+.mbody{padding:20px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:480px){.fgrid{grid-template-columns:1fr}}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.finput{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:14px;font-family:var(--font);color:var(--text);background:var(--surface);transition:border-color .15s;appearance:none}
+.finput:focus{outline:none;border-color:var(--blue)}
+.entry-dates{grid-column:1/-1; font-size:11px; color:var(--muted); text-align:center; margin-top:12px; padding:10px; background:#f8fafc; border-radius:var(--rs); border:1px dashed var(--border);}
+.mft{padding:14px 20px;border-top:1px solid var(--border);background:#fafbff;display:flex;gap:10px}
+.mft .btn{flex:1;justify-content:center}
+.cmodal{background:var(--surface);border-radius:var(--r);width:100%;max-width:360px;box-shadow:var(--shadow-lg);padding:28px 24px;text-align:center;animation:su .2s cubic-bezier(.4,0,.2,1);will-change:transform,opacity;contain:layout paint}
+.cicon{font-size:44px;color:var(--red);margin-bottom:14px}
+.ctitle{font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:8px}
+.cdesc{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+.cact{display:flex;gap:10px}
+.cact .btn{flex:1;justify-content:center}
+
+/* REMINDER DRAG-DROP */
+.rem-list{display:flex;flex-direction:column;gap:10px;contain:layout style}
+.rem-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:var(--rs);padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:grab;transition:box-shadow .15s ease-out,transform .15s ease-out,opacity .15s ease-out,border-left-color .15s ease-out;user-select:none;will-change:transform,box-shadow;contain:layout paint}
+.rem-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.rem-card:active{transform:scale(0.98);transition-duration:.08s;cursor:grabbing}
+.rem-card.s-online{border-left-color:#8b5cf6;background:linear-gradient(135deg,#f5f3ff 0%,var(--surface) 100%)}
+.rem-card.s-prog{border-left-color:var(--accent);background:linear-gradient(135deg,#fffbeb 0%,var(--surface) 100%)}
+.rem-card.s-other{border-left-color:#94a3b8;background:linear-gradient(135deg,#f8fafc 0%,var(--surface) 100%)}
+.rem-card.s-online .pay-name i{color:#8b5cf6}
+.rem-card.s-prog .pay-name i{color:var(--accent)}
+.rem-card.s-other .pay-name i{color:#94a3b8}
+.rem-card.dragging{opacity:.4;transform:scale(0.98);transition-duration:.08s}
+.rem-card.drag-over{box-shadow:0 0 0 2px var(--blue);border-color:var(--blue)}
+.rh{width:18px;flex-shrink:0;color:var(--muted);font-size:15px;cursor:grab;}
+.rh:active{cursor:grabbing;}
+.rem-card .pay-name{gap:8px;min-width:0}
+.rem-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rem-card .pay-details{gap:14px}
+.rem-card .pay-right{gap:8px}
+.racts{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ricn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:6px;transition:background .15s,color .15s;}
+.ricn:hover{background:var(--bg);color:var(--text);}
+.rem-empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.rem-empty i{font-size:38px;opacity:.2;margin-bottom:10px;display:block;}
+.rem-empty p{font-size:15px;}
+.rem-card.paid{opacity:.45;background:#f8fafc;border-style:dashed;border-left-style:solid;border-left-color:var(--green);cursor:default}
+.rem-card.paid .rh{opacity:.35}
+.rem-card.paid .rem-nm{text-decoration:line-through;color:var(--muted)}
+.rem-card.paid:hover{opacity:.75;transform:none}
+.rem-paid{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;background:#d1fae5;color:#065f46;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rem-recv{font-size:11px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.rem-card .pay-cb{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;display:none}
+.pay-select .rem-card .pay-cb{display:block}
+.rem-select .rem-card{cursor:pointer}
+.pay-select .rem-card{cursor:pointer}
+/* REMINDER DETAIL */
+.rd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:480px){.rd-grid{grid-template-columns:1fr}}
+.rd-item{background:#f8fafc;border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;min-width:0}
+.rd-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.rd-val{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.rem-tick{width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nb) + 20px);left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:var(--rs);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);z-index:999;opacity:0;pointer-events:none;transition:opacity .2s ease-out,transform .2s ease-out;display:flex;align-items:center;gap:8px;white-space:nowrap;will-change:transform,opacity}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+/* FILTER PILLS */
+.filter-pills{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .15s;display:flex;align-items:center;gap:5px}
+.pill:hover{border-color:var(--blue);color:var(--blue)}
+.pill.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pill i{font-size:10px}
+
+/* PAYMENT CARDS */
+.pay-list{display:flex;flex-direction:column;gap:10px;contain:layout style}
+.mobile-view{display:none}
+.desktop-view{display:block}
+@media(max-width:768px){
+  .mobile-view{display:flex;flex-direction:column;gap:10px}
+  .desktop-view{display:none}
+}
+.pay-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:var(--rs);padding:16px 18px;cursor:pointer;transition:box-shadow .15s ease-out,transform .15s ease-out,border-left-color .15s ease-out;user-select:none;display:flex;align-items:center;gap:14px;will-change:transform,box-shadow;contain:layout paint}
+.pay-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-left-color:var(--navy)}
+.pay-card:active{transform:scale(0.98);transition-duration:.08s}
+.pay-card.s-cash{border-left-color:var(--green);background:linear-gradient(135deg,#f0fdf4 0%,var(--surface) 100%)}
+.pay-card.s-online{border-left-color:#8b5cf6;background:linear-gradient(135deg,#f5f3ff 0%,var(--surface) 100%)}
+.pay-card.s-out{border-left-color:var(--red);background:linear-gradient(135deg,#fef2f2 0%,var(--surface) 100%)}
+.pay-card.s-prog{border-left-color:var(--accent);background:linear-gradient(135deg,#fffbeb 0%,var(--surface) 100%)}
+.pay-card.s-done{border-left-color:var(--green);background:linear-gradient(135deg,#f0fdf4 0%,var(--surface) 100%)}
+.pay-card.s-other{border-left-color:#94a3b8;background:linear-gradient(135deg,#f8fafc 0%,var(--surface) 100%)}
+.pay-cb{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;display:none}
+.pay-select .pay-cb{display:block}
+.pay-info{flex:1;min-width:0}
+.pay-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.pay-name i{font-size:12px;color:var(--blue);opacity:.7}
+.pay-card.s-cash .pay-name i{color:var(--green)}
+.pay-card.s-online .pay-name i{color:#8b5cf6}
+.pay-card.s-out .pay-name i{color:var(--red)}
+.pay-details{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pay-amt{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:5px}
+.pay-amt i{font-size:11px;color:var(--muted)}
+.pay-month{font-size:12px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:5px}
+.pay-month i{font-size:11px;opacity:.7}
+.pay-right{display:flex;align-items:center;flex-shrink:0}
+.pay-card .sb,.rem-card .sb{padding:4px 12px;font-size:11px;font-weight:500;letter-spacing:.3px}
+.sel-all-pill{background:var(--blue)!important;color:#fff!important;border-color:var(--blue)!important;cursor:pointer}
+.sel-all-pill:hover{background:#1d4ed8!important}
+.sel-all-pill.active{background:var(--red)!important;border-color:var(--red)!important}
+.pay-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.pay-empty i{font-size:38px;opacity:.2;margin-bottom:10px;display:block}
+.pay-empty p{font-size:15px}
+.pay-card .ricn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px 6px;border-radius:6px;transition:background .15s,color .15s;}
+.pay-card .ricn:hover{background:var(--bg);color:var(--text);}
+.archive-expiry{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.expiry-ok{background:#d1fae5;color:#065f46;}
+.expiry-mid{background:#dbeafe;color:#1e40af;}
+.expiry-warn{background:#fef3c7;color:#92400e;}
+.expiry-danger{background:#fee2e2;color:#991b1b;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px;transition:background .2s}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+*{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"><i id="t-icon"></i><span id="t-msg"></span></div>
+
+<div class="mbk" id="cbk">
+  <div class="cmodal">
+    <div class="cicon" id="c-icon"><i class="fas fa-triangle-exclamation"></i></div>
+    <div class="ctitle" id="c-title">Delete?</div>
+    <div class="cdesc"  id="c-desc">This cannot be undone.</div>
+    <div class="cact">
+      <button class="btn btn-g" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-d" id="c-ok"><i class="fas fa-trash"></i> Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbk" id="pbk" style="z-index:350">
+  <div class="cmodal" style="max-width:330px">
+    <div class="cicon" style="color:var(--navy)"><i class="fas fa-lock"></i></div>
+    <div class="ctitle">Password Required</div>
+    <div class="cdesc" id="p-desc">Enter password to continue.</div>
+    <input type="password" id="p-input" class="finput" style="text-align:center;letter-spacing:6px;font-size:20px" placeholder="•••" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();submitPassword()}">
+    <div id="p-err" class="hidden" style="margin-top:10px;font-size:12px;font-weight:700;color:var(--red)">Wrong password. Try again.</div>
+    <div class="cact" style="margin-top:18px">
+      <button class="btn btn-g" onclick="closePassword()">Cancel</button>
+      <button class="btn btn-p" onclick="submitPassword()"><i class="fas fa-unlock"></i> Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbk" id="ebk">
+  <div class="modal">
+    <div class="mhd">
+      <span class="mtitle" id="m-title">Add Entry</span>
+      <button class="mclose" onclick="closeModal()">&times;</button>
+    </div>
+    <form id="eform" onsubmit="saveEntry(event)">
+      <div class="mbody">
+        <div class="fgrid" id="ffields"></div>
+        <div id="m-dates"></div>
+        <input type="hidden" id="eidx" value="-1">
+      </div>
+      <div class="mft">
+        <button type="button" id="m-del" class="btn btn-d hidden" onclick="triggerDelete()"><i class="fas fa-trash"></i></button>
+        <button type="button" class="btn btn-g" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-p" id="m-save"><i class="fas fa-save"></i> Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="mbk" id="expirybk">
+  <div class="cmodal" style="max-width:320px">
+    <div class="cicon" style="color:var(--blue)"><i class="fas fa-clock"></i></div>
+    <div class="ctitle">Expiry Date</div>
+    <div class="cdesc" id="expiry-date" style="font-size:20px;font-weight:700;font-family:var(--fh);color:var(--text);margin-bottom:18px"></div>
+    <div class="cact">
+      <button class="btn btn-p" onclick="closeExpiryModal()" style="flex:1;justify-content:center">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbk" id="remdetailbk">
+  <div class="modal" style="max-width:460px">
+    <div class="mhd">
+      <span class="mtitle" id="rd-title">Reminder Details</span>
+      <button class="mclose" onclick="closeReminderDetail()">&times;</button>
+    </div>
+    <div class="mbody">
+      <div class="rd-grid" id="rd-grid"></div>
+      <div id="rd-dates"></div>
+    </div>
+    <div class="mft">
+      <button type="button" class="btn btn-d" id="rd-del" onclick="rdDelete()"><i class="fas fa-trash"></i></button>
+      <button type="button" class="btn btn-g" onclick="closeReminderDetail()" style="flex:1;justify-content:center">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <header class="header">
+    <div class="hbrand">
+      <div class="hicon"><i class="fas fa-chart-bar"></i></div>
+      <div><div class="htitle">DOP Tracker</div><div class="hsub">Agent Portal Utility</div></div>
+    </div>
+    <nav class="dtabs">
+      <button class="dtab active" data-tab="home"      onclick="switchTab('home')"><i class="fas fa-house"></i> Home</button>
+      <button class="dtab"        data-tab="payments"  onclick="switchTab('payments')"><i class="fas fa-credit-card"></i> Payments</button>
+      <button class="dtab"        data-tab="formality" onclick="switchTab('formality')"><i class="fas fa-folder"></i> Collections</button>
+      <button class="dtab"        data-tab="default"   onclick="switchTab('default')"><i class="fas fa-calendar-days"></i> Default</button>
+      <button class="dtab"        data-tab="reminder"  onclick="switchTab('reminder')"><i class="fas fa-bell"></i> Reminder</button>
+      <button class="dtab"        data-tab="archive"   onclick="switchTab('archive')"><i class="fas fa-box-archive"></i> Archive</button>
+    </nav>
+  </header>
+
+  <main class="content">
+
+    <div id="page-home" class="page active">
+      <div class="hgrid">
+        <div class="scard" data-tab="payments" onclick="switchTab('payments')">
+          <div class="sc-label">Payments</div>
+          <div class="sc-val" id="cnt-p">0</div>
+          <i class="fas fa-credit-card sc-icon"></i>
+        </div>
+        <div class="scard" data-tab="formality" onclick="switchTab('formality')">
+          <div class="sc-label">Collections</div>
+          <div class="sc-val" id="cnt-f">0</div>
+          <i class="fas fa-folder-open sc-icon"></i>
+        </div>
+        <div class="scard" data-tab="default" onclick="switchTab('default')">
+          <div class="sc-label">Defaults</div>
+          <div class="sc-val" id="cnt-d">0</div>
+          <i class="fas fa-calendar-days sc-icon"></i>
+        </div>
+        <div class="scard" data-tab="reminder" onclick="switchTab('reminder')" style="--ca:#8b5cf6">
+          <div class="sc-label">Reminders</div>
+          <div class="sc-val" id="cnt-r">0</div>
+          <i class="fas fa-bell sc-icon"></i>
+        </div>
+      </div>
+      <div class="home-rec">
+        <div class="rec-head"><span class="rec-title">Recent Activity</span></div>
+        <div id="rec-list" class="rec-list"></div>
+      </div>
+    </div>
+
+    <div id="page-payments" class="page">
+      <div class="page-hdr">
+        <div>
+          <div class="sec-title">Payments</div>
+          <div class="sec-sub">Track all RD payment records</div>
+        </div>
+      </div>
+      <div class="tsummary" id="sum-payments"></div>
+      <div class="toolbar">
+        <div class="sw"><i class="fas fa-magnifying-glass"></i>
+          <input class="sinput" id="s-payments" type="text" placeholder="Search payments…" oninput="filterTable('payments')">
+        </div>
+        <button class="btn btn-d hidden" id="bulk-payments" onclick="confirmBulk('payments')"><i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-d hidden" id="archive-payments" onclick="archiveSelectedPayments()" style="background:#fef3c7;color:#d97706;border:1px solid #fde68a"><i class="fas fa-box-archive"></i> Archive</button>
+        <button class="btn btn-g" id="select-payments" onclick="toggleSelectMode('payments')"><i class="fas fa-check-double"></i> Select</button>
+        <button class="btn btn-p" onclick="openModal('payments')"><i class="fas fa-plus"></i> New</button>
+      </div>
+      <div class="filter-pills" id="fs-payments">
+        <span class="pill active" onclick="setStatusFilter('payments','all')">All</span>
+        <span class="pill" onclick="setStatusFilter('payments','Cash')"><i class="fas fa-money-bill-wave"></i> Cash</span>
+        <span class="pill" onclick="setStatusFilter('payments','Online')"><i class="fas fa-globe"></i> Online</span>
+        <span class="pill" onclick="setStatusFilter('payments','Out')"><i class="fas fa-arrow-right-from-bracket"></i> Out</span>
+      </div>
+      <div class="filter-pills hidden" id="select-bar-payments">
+        <span class="pill sel-all-pill" onclick="toggleAll('payments')"><i class="fas fa-check-double"></i> Select All</span>
+      </div>
+      <div id="tb-payments" class="pay-list"></div>
+    </div>
+
+    <div id="page-formality" class="page">
+      <div class="page-hdr">
+        <div>
+          <div class="sec-title">Collections</div>
+          <div class="sec-sub">Manage document formality &amp; collection status</div>
+        </div>
+      </div>
+      <div class="tsummary" id="sum-formality"></div>
+      <div class="toolbar">
+        <div class="sw"><i class="fas fa-magnifying-glass"></i>
+          <input class="sinput" id="s-formality" type="text" placeholder="Search collections…" oninput="filterTable('formality')">
+        </div>
+        <button class="btn btn-d hidden" id="bulk-formality" onclick="confirmBulk('formality')"><i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-g" id="select-formality" onclick="toggleSelectMode('formality')"><i class="fas fa-check-double"></i> Select</button>
+        <button class="btn btn-p" onclick="openModal('formality')"><i class="fas fa-plus"></i> New</button>
+      </div>
+      <div class="filter-pills hidden" id="select-bar-formality">
+        <span class="pill sel-all-pill" onclick="toggleAll('formality')"><i class="fas fa-check-double"></i> Select All</span>
+      </div>
+      <div id="tb-formality" class="pay-list"></div>
+    </div>
+
+    <div id="page-default" class="page">
+      <div class="page-hdr">
+        <div>
+          <div class="sec-title">Daily Default A/C</div>
+          <div class="sec-sub">Monitor defaulted accounts &amp; day counts</div>
+        </div>
+      </div>
+      <div class="tsummary" id="sum-default"></div>
+      <div class="toolbar">
+        <div class="sw"><i class="fas fa-magnifying-glass"></i>
+          <input class="sinput" id="s-default" type="text" placeholder="Search defaults…" oninput="filterTable('default')">
+        </div>
+        <button class="btn btn-d hidden" id="bulk-default" onclick="confirmBulk('default')"><i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-g" id="select-default" onclick="toggleSelectMode('default')"><i class="fas fa-check-double"></i> Select</button>
+        <button class="btn btn-p" onclick="openModal('default')"><i class="fas fa-plus"></i> New</button>
+      </div>
+      <div class="filter-pills hidden" id="select-bar-default">
+        <span class="pill sel-all-pill" onclick="toggleAll('default')"><i class="fas fa-check-double"></i> Select All</span>
+      </div>
+      <div id="tb-default" class="pay-list"></div>
+    </div>
+
+    <div id="page-reminder" class="page">
+      <div class="page-hdr">
+        <div>
+          <div class="sec-title">Reminder</div>
+          <div class="sec-sub">Drag to reorder reminder records</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div class="sw"><i class="fas fa-magnifying-glass"></i>
+          <input class="sinput" id="s-reminder" type="text" placeholder="Search reminders…" oninput="renderReminder()">
+        </div>
+        <button class="btn btn-d hidden" id="bulk-reminder" onclick="confirmBulk('reminder')"><i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-g" id="select-reminder" onclick="toggleSelectMode('reminder')"><i class="fas fa-check-double"></i> Select</button>
+        <button class="btn btn-g" onclick="askPassword('Enter password to import reminders.', importRemindersExcel)" style="color:#16a34a;border-color:#bbf7d0"><i class="fas fa-file-excel"></i> Import</button>
+        <button class="btn btn-p" onclick="openReminderModal()"><i class="fas fa-plus"></i> New</button>
+      </div>
+      <div class="filter-pills hidden" id="select-bar-reminder">
+        <span class="pill sel-all-pill" onclick="toggleAll('reminder')"><i class="fas fa-check-double"></i> Select All</span>
+      </div>
+      <div id="rem-list" class="rem-list"></div>
+    </div>
+
+    <div id="page-archive" class="page">
+      <div class="page-hdr">
+        <div>
+          <div class="sec-title">Archive</div>
+          <div class="sec-sub">Archived payment records (6 months retention)</div>
+        </div>
+      </div>
+      <div class="tsummary" id="sum-archive"></div>
+      <div class="toolbar">
+        <div class="sw"><i class="fas fa-magnifying-glass"></i>
+          <input class="sinput" id="s-archive" type="text" placeholder="Search archived records…" oninput="renderArchive()">
+        </div>
+        <button class="btn btn-p hidden" id="bulk-archive" onclick="confirmBulkArchive()"><i class="fas fa-rotate-left"></i> Restore</button>
+        <button class="btn btn-d hidden" id="del-archive" onclick="confirmBulkDeleteArchive()"><i class="fas fa-trash"></i> Delete</button>
+        <button class="btn btn-g" id="select-archive" onclick="toggleSelectMode('archive')"><i class="fas fa-check-double"></i> Select</button>
+      </div>
+      <div class="filter-pills hidden" id="select-bar-archive">
+        <span class="pill sel-all-pill" onclick="toggleAll('archive')"><i class="fas fa-check-double"></i> Select All</span>
+      </div>
+      <div id="tb-archive" class="pay-list"></div>
+    </div>
+
+  </main>
+</div>
+
+<nav class="mnav">
+  <button class="mni active" data-tab="home"      onclick="switchTab('home')"><i class="fas fa-house"></i><span>Home</span></button>
+  <button class="mni"        data-tab="payments"  onclick="switchTab('payments')"><i class="fas fa-credit-card"></i><span>Payments</span></button>
+  <button class="mni"        data-tab="formality" onclick="switchTab('formality')"><i class="fas fa-folder"></i><span>Collections</span></button>
+  <button class="mni"        data-tab="default"   onclick="switchTab('default')"><i class="fas fa-calendar-days"></i><span>Default</span></button>
+  <button class="mni"        data-tab="reminder"  onclick="switchTab('reminder')"><i class="fas fa-bell"></i><span>Reminder</span></button>
+  <button class="mni"        data-tab="archive"   onclick="switchTab('archive')"><i class="fas fa-box-archive"></i><span>Archive</span></button>
+</nav>
+
+<datalist id="cso">
+  <option value="In-Progress"><option value="Collected">
+  <option value="1 Photo Remain"><option value="2 Photo Remain"><option value="3 Photo Remain">
+  <option value="Signature Remain"><option value="Re-Signature"><option value="Denomination Remain">
+  <option value="Aadhaar Remain"><option value="PAN Remain"><option value="Nominee Remain">
+  <option value="Mobile No. Remain">
+</datalist>
+
+<datalist id="remnames"></datalist>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────────
+function normaliseSection(val) {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.filter(Boolean);
+  return Object.values(val).filter(Boolean);
+}
+
+// Batch DOM updates for smooth rendering
+function batchUpdate(fn) {
+  requestAnimationFrame(fn);
+}
+
+window.loadDB = function () {
+  try {
+    const raw = JSON.parse(localStorage.getItem('dop_db'));
+    return {
+      payments : normaliseSection(raw && raw.payments),
+      formality: normaliseSection(raw && raw.formality),
+      'default': normaliseSection(raw && raw['default']),
+      reminder : normaliseSection(raw && raw.reminder),
+      archive  : normaliseSection(raw && raw.archive)
+    };
+  } catch (e) {
+    return { payments: [], formality: [], 'default': [], reminder: [], archive: [] };
+  }
+};
+
+function loadDB() { return window.loadDB(); }
+
+function saveDB(data) {
+  data.payments  = normaliseSection(data.payments);
+  data.formality = normaliseSection(data.formality);
+  data['default']= normaliseSection(data['default']);
+  data.reminder  = sortPaidLast(normaliseSection(data.reminder));
+  data.archive   = normaliseSection(data.archive);
+  localStorage.setItem('dop_db', JSON.stringify(data));
+}
+
+window.refreshUI = function () {
+  if (currentTab === 'home') {
+    renderHome();
+  } else if (currentTab === 'reminder') {
+    renderReminder();
+  } else if (currentTab === 'archive') {
+    renderArchive();
+  } else {
+    renderTable(currentTab);
+  }
+};
+
+// ── config ───────────────────────────────────────────────────────────────────
+const CFG = {
+  payments: {
+    cols:  ['Name','Amount','Month','Status'],
+    keys:  ['name','amount','month','status'],
+    fields:[
+      {name:'name',  label:'Name',               type:'datalist', list:'remnames', required:true, placeholder:'Type or pick from Reminder list…'},
+      {name:'amount',label:'Amount (₹)',          type:'text', format:true},
+      {name:'month', label:'Month (e.g. Jan 25)', type:'text'},
+      {name:'status',label:'Status', type:'select', options:['Cash','Online','Out']}
+    ]
+  },
+  formality: {
+    cols:  ['Name','Address','Deno','Status'],
+    keys:  ['name','address','deno','status'],
+    fields:[
+      {name:'name',   label:'Name',         type:'text'},
+      {name:'address',label:'Address',      type:'text'},
+      {name:'deno',   label:'Denomination', type:'text', format:true},
+      {name:'status', label:'Status',       type:'datalist', list:'cso'}
+    ]
+  },
+  'default': {
+    cols:  ['Name','Month','Days','Deno','Address'],
+    keys:  ['name','month','days','deno','address'],
+    fields:[
+      {name:'name',   label:'Name',           type:'text'},
+      {name:'month',  label:'Month',          type:'month'},
+      {name:'days',   label:'Days Collected', type:'number'},
+      {name:'deno',   label:'Denomination',   type:'text', format:true},
+      {name:'address',label:'Address',        type:'text'}
+    ]
+  }
+};
+
+// ── sort state ───────────────────────────────────────────────────────────────
+let currentSort = { tab: '', key: '', dir: 'asc' };
+let dateSort = { payments: 'default' };
+let statusFilter = { payments: 'all' };
+
+function handleSort(tab, key) {
+  if (currentSort.tab === tab && currentSort.key === key) {
+    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+    // third click → reset
+    if (currentSort._clicks) { currentSort = { tab:'', key:'', dir:'asc', _clicks:0 }; return; }
+    currentSort._clicks = 1;
+  } else {
+    currentSort = { tab, key, dir: 'asc', _clicks: 0 };
+  }
+  renderTable(tab);
+}
+
+function getSortIcon(tab, key) {
+  if (currentSort.tab !== tab || currentSort.key !== key)
+    return '<i class="fas fa-sort sort-icon"></i>';
+  return currentSort.dir === 'asc'
+    ? '<i class="fas fa-sort-up sort-icon"></i>'
+    : '<i class="fas fa-sort-down sort-icon"></i>';
+}
+
+// ── date sort pills ──────────────────────────────────────────────────────────
+function setDateSort(tab, mode) {
+  dateSort[tab] = mode;
+  const pills = document.querySelectorAll('#fp-' + tab + ' .pill');
+  pills.forEach(p => p.classList.remove('active'));
+  const idx = mode === 'default' ? 0 : mode === 'createdAt' ? 1 : 2;
+  if (pills[idx]) pills[idx].classList.add('active');
+  renderTable(tab);
+}
+
+function setStatusFilter(tab, status) {
+  statusFilter[tab] = status;
+  const pills = document.querySelectorAll('#fs-' + tab + ' .pill');
+  pills.forEach(p => p.classList.remove('active'));
+  const idx = status === 'all' ? 0 : status === 'Cash' ? 1 : status === 'Online' ? 2 : 3;
+  if (pills[idx]) pills[idx].classList.add('active');
+  renderTable(tab);
+}
+
+let selectMode = { payments: false, formality: false, 'default': false, archive: false, reminder: false };
+
+function toggleSelectMode(tab) {
+  selectMode[tab] = !selectMode[tab];
+  const btn = document.getElementById('select-' + tab);
+  const list = document.getElementById(tab === 'reminder' ? 'rem-list' : 'tb-' + tab);
+  const selBar = document.getElementById('select-bar-' + tab);
+  if (selectMode[tab]) {
+    btn.classList.add('active');
+    btn.innerHTML = '<i class="fas fa-xmark"></i> Cancel';
+    btn.classList.remove('btn-g');
+    btn.classList.add('btn-d');
+    if (list) list.classList.add('pay-select');
+    if (selBar) selBar.classList.remove('hidden');
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '<i class="fas fa-check-double"></i> Select';
+    btn.classList.remove('btn-d');
+    btn.classList.add('btn-g');
+    if (list) list.classList.remove('pay-select');
+    if (selBar) selBar.classList.add('hidden');
+    document.querySelectorAll(`.ecb-${tab}`).forEach(cb => cb.checked = false);
+    const sa = document.getElementById('sa-' + tab);
+    if (sa) sa.checked = false;
+    syncBulk(tab);
+  }
+  if (tab === 'reminder') renderReminder();
+}
+
+// ── formatting ───────────────────────────────────────────────────────────────
+function formatNum(e) {
+  let val = e.target.value.replace(/[^0-9]/g, '');
+  e.target.value = val ? Number(val).toLocaleString('en-IN') : '';
+}
+
+function fmt(key, val) {
+  if (val === '' || val == null) return '—';
+  if (['amount','deno','days'].includes(key) && !isNaN(val))
+    return Number(val).toLocaleString('en-IN');
+  if (key === 'month' && val && val.includes('-')) {
+    const [y,m] = val.split('-');
+    return new Date(y, m-1).toLocaleString('default',{month:'short',year:'numeric'});
+  }
+  return val || '—';
+}
+
+function badge(tab, val) {
+  if (tab === 'payments') {
+    if (val === 'Cash')   return `<span class="sb s-cash">Cash</span>`;
+    if (val === 'Online') return `<span class="sb s-online">Online</span>`;
+    if (val === 'Out')    return `<span class="sb s-out">Out</span>`;
+    return `<span class="sb s-other">${val||'—'}</span>`;
+  }
+  if (tab === 'formality') {
+    if (val === 'Collected')   return `<span class="sb s-done">Collected</span>`;
+    if (val === 'In-Progress') return `<span class="sb s-prog">In-Progress</span>`;
+    return `<span class="sb s-other">${val||'—'}</span>`;
+  }
+  if (tab === 'reminder') {
+    if (val === '1st') return `<span class="sb s-online">1st</span>`;
+    if (val === '2nd') return `<span class="sb s-prog">2nd</span>`;
+    return `<span class="sb s-other">${val||'—'}</span>`;
+  }
+  return val || '—';
+}
+
+// ── tab switching ─────────────────────────────────────────────────────────────
+let currentTab = 'home';
+
+function switchTab(tab) {
+  currentTab = tab;
+
+  document.querySelectorAll('[data-tab]').forEach(el =>
+    el.classList.toggle('active', el.dataset.tab === tab)
+  );
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+
+  if (tab === 'home') {
+    renderHome();
+  } else if (tab === 'reminder') {
+    const si = document.getElementById('s-reminder');
+    if (si) si.value = '';
+    resetMonthlyPaid();
+    renderReminder();
+  } else if (tab === 'archive') {
+    renderArchive();
+  } else {
+    const si = document.getElementById('s-' + tab);
+    if (si) si.value = '';
+    currentSort = { tab: '', key: '', dir: 'asc' };
+    renderTable(tab);
+  }
+}
+
+// ── home ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const db = loadDB();
+
+  batchUpdate(() => {
+    document.getElementById('cnt-p').textContent = db.payments.length;
+    document.getElementById('cnt-f').textContent = db.formality.length;
+    document.getElementById('cnt-d').textContent = db['default'].length;
+    const cntR = document.getElementById('cnt-r');
+    if (cntR) cntR.textContent = (db.reminder||[]).length;
+
+    const all = [
+      ...db.payments.map((r,i) => ({...r, _t:'payments',  _idx:i})),
+      ...db.formality.map((r,i) => ({...r, _t:'formality', _idx:i})),
+      ...db['default'].map((r,i) => ({...r, _t:'default',   _idx:i}))
+    ].sort((a,b) =>
+      new Date(b.updatedAt||b.createdAt||0) - new Date(a.updatedAt||a.createdAt||0)
+    ).slice(0,10);
+
+    const list = document.getElementById('rec-list');
+    if (!all.length) {
+      list.innerHTML = '<div class="empty-home">No records yet. Add your first entry!</div>';
+      return;
+    }
+    list.innerHTML = all.map(r => {
+      const bc  = r._t==='payments' ? 'bb' : r._t==='formality' ? 'bg' : 'ba';
+      const lbl = r._t==='payments' ? 'Payment' : r._t==='formality' ? 'Collection' : 'Default';
+      const dot = r._t==='payments' ? '#2563eb' : r._t==='formality' ? '#10b981' : '#f59e0b';
+      const sub = r._t==='payments'
+        ? (r.amount ? '₹'+Number(r.amount).toLocaleString('en-IN') : r.month||'')
+        : (r.address||(r.deno ? '₹'+Number(r.deno).toLocaleString('en-IN') : ''));
+      return `<div class="rec-item">
+        <div class="rec-dot" style="background:${dot}"></div>
+        <div><div class="rec-name">${r.name||'—'}</div><div class="rec-sub">${sub}</div></div>
+        <span class="rec-badge ${bc}">${lbl}</span>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── table ─────────────────────────────────────────────────────────────────────
+function renderTable(tab) {
+  const filter = (document.getElementById('s-' + tab) || {}).value || '';
+  const db   = loadDB();
+  const c    = CFG[tab];
+  const head = document.getElementById('th-' + tab);
+  const body = document.getElementById('tb-' + tab);
+
+  if (!body) return;
+
+  let rows = (db[tab] || []).map((r,i) => ({...r, _idx:i}));
+
+  if (filter) {
+    const f = filter.toLowerCase();
+    rows = rows.filter(r => Object.values(r).some(v => (v+'').toLowerCase().includes(f)));
+  }
+
+  if (statusFilter[tab] && statusFilter[tab] !== 'all') {
+    rows = rows.filter(r => r.status === statusFilter[tab]);
+  }
+
+  if (currentSort.tab===tab && currentSort.key) {
+    const key = currentSort.key;
+    const dir = currentSort.dir==='asc' ? 1 : -1;
+    rows.sort((a,b) => {
+      let A = a[key]||'', B = b[key]||'';
+      if (['amount','deno','days'].includes(key)) {
+        A = Number((A+'').replace(/,/g,''))||0;
+        B = Number((B+'').replace(/,/g,''))||0;
+        return (A-B)*dir;
+      }
+      return (A+'').localeCompare(B+'')*dir;
+    });
+  } else if (dateSort[tab] && dateSort[tab] !== 'default') {
+    const dKey = dateSort[tab];
+    rows.sort((a,b) => {
+      const da = a[dKey] ? new Date(a[dKey]).getTime() : 0;
+      const db_ = b[dKey] ? new Date(b[dKey]).getTime() : 0;
+      return db_ - da;
+    });
+  }
+
+  batchUpdate(() => {
+    const sumEl = document.getElementById('sum-' + tab);
+    if (sumEl) {
+      const allRows = (db[tab] || []).map((r,i) => ({...r, _idx:i}));
+      function amt(r){ return Number((r.amount||'').replace(/,/g,''))||0; }
+      function dno(r){ return Number((r.deno||'').replace(/,/g,''))||0; }
+      function sc(n){ return '₹'+Number(n).toLocaleString('en-IN'); }
+      function box(cls,lbl,count,amount){
+        return `<div class="ts-box ${cls}">
+          <div class="ts-lbl">${lbl}</div>
+          <div class="ts-row">
+            <span class="ts-count">${count}</span>
+            <span class="ts-sep">~</span>
+            <span class="ts-amt">${sc(amount)}</span>
+          </div>
+        </div>`;
+      }
+      if (tab==='payments') {
+        const cashRows    = allRows.filter(r=>r.status==='Cash');
+        const onlineRows  = allRows.filter(r=>r.status==='Online');
+        const outRows     = allRows.filter(r=>r.status==='Out');
+        const totalAmt    = allRows.reduce((a,r)=>a+amt(r),0);
+        const cashAmt     = cashRows.reduce((a,r)=>a+amt(r),0);
+        const onlineAmt   = onlineRows.reduce((a,r)=>a+amt(r),0);
+        const outAmt      = outRows.reduce((a,r)=>a+amt(r),0);
+        const combinedOnlineCount = onlineRows.length + outRows.length;
+        const combinedOnlineAmt   = onlineAmt + outAmt;
+        const pendingAmt          = onlineAmt;
+        sumEl.innerHTML =
+          box('ts-collect','Total Collect', allRows.length, totalAmt) +
+          box('ts-cash',   'Total Cash',    cashRows.length, cashAmt) +
+          box('ts-online', 'Total Online',  combinedOnlineCount, combinedOnlineAmt) +
+          box('ts-out',    'Total Out',     outRows.length, outAmt) +
+          box('ts-pending','Pending Online',onlineRows.length, pendingAmt);
+      } else if (tab==='formality') {
+        const doneRows = allRows.filter(r=>r.status==='Collected');
+        const progRows = allRows.filter(r=>r.status==='In-Progress');
+        const totalDno = allRows.reduce((a,r)=>a+dno(r),0);
+        const doneDno  = doneRows.reduce((a,r)=>a+dno(r),0);
+        const progDno  = progRows.reduce((a,r)=>a+dno(r),0);
+        sumEl.innerHTML =
+          box('ts-collect','Total A/C',       allRows.length, totalDno) +
+          box('ts-done',   'Total Collected', doneRows.length, doneDno) +
+          box('ts-prog',   'Total In-Prog',   progRows.length, progDno);
+      } else if (tab==='default') {
+        const maxDays = allRows.length ? Math.max(...allRows.map(r=>Number(r.days)||0)) : 0;
+        sumEl.innerHTML = `
+          <div class="ts-box ts-collect"><div class="ts-lbl">Total A/C</div><div class="ts-row"><span class="ts-count">${allRows.length}</span></div></div>
+          <div class="ts-box ts-out"><div class="ts-lbl">Max Days</div><div class="ts-row"><span class="ts-count">${maxDays}</span></div></div>`;
+      }
+    }
+
+    if (!rows.length) {
+      body.innerHTML = `<div class="pay-empty"><i class="fas fa-inbox"></i>
+        <p>${filter?'No matching records.':'No records yet. Click New to add one.'}</p></div>`;
+      syncBulk(tab);
+      return;
+    }
+
+    const isDesktop = window.innerWidth > 768;
+
+    function cardPayments(row) {
+      const statusCls = row.status === 'Cash' ? 's-cash' : row.status === 'Online' ? 's-online' : row.status === 'Out' ? 's-out' : '';
+      const amtFmt = row.amount ? Number(row.amount).toLocaleString('en-IN') : '—';
+      const monthFmt = row.month ? fmt('month', row.month) : '—';
+      return `<div class="pay-card ${statusCls}" onclick="openModal('payments',${row._idx})">
+        <input type="checkbox" class="pay-cb ecb-payments" data-i="${row._idx}" onclick="event.stopPropagation();syncBulk('payments')">
+        <div class="pay-info">
+          <div class="pay-name"><i class="fas fa-user"></i> ${row.name || '—'}</div>
+          <div class="pay-details">
+            <span class="pay-amt"><i class="fas fa-indian-rupee-sign"></i> ${amtFmt}</span>
+            <span class="pay-month"><i class="fas fa-calendar"></i> ${monthFmt}</span>
+          </div>
+        </div>
+        <div class="pay-right">${badge('payments', row.status)}</div>
+      </div>`;
+    }
+    function rowPayments(row) {
+      const statusCls = row.status === 'Cash' ? 's-cash' : row.status === 'Online' ? 's-online' : row.status === 'Out' ? 's-out' : '';
+      const amtFmt = row.amount ? Number(row.amount).toLocaleString('en-IN') : '—';
+      const monthFmt = row.month ? fmt('month', row.month) : '—';
+      return `<tr onclick="openModal('payments',${row._idx})">
+        <td class="cbc" onclick="event.stopPropagation()"><input type="checkbox" class="rcb ecb-payments" data-i="${row._idx}" onclick="syncBulk('payments')"></td>
+        <td>${row.name || '—'}</td>
+        <td style="font-weight:600">${amtFmt}</td>
+        <td>${monthFmt}</td>
+        <td>${badge('payments', row.status)}</td>
+      </tr>`;
+    }
+    function cardFormality(row) {
+      const statusCls = row.status === 'Collected' ? 's-done' : row.status === 'In-Progress' ? 's-prog' : 's-other';
+      const denoFmt = row.deno ? '₹' + Number(row.deno).toLocaleString('en-IN') : '—';
+      return `<div class="pay-card ${statusCls}" onclick="openModal('formality',${row._idx})">
+        <input type="checkbox" class="pay-cb ecb-formality" data-i="${row._idx}" onclick="event.stopPropagation();syncBulk('formality')">
+        <div class="pay-info">
+          <div class="pay-name"><i class="fas fa-user"></i> ${row.name || '—'}</div>
+          <div class="pay-details">
+            <span class="pay-amt"><i class="fas fa-indian-rupee-sign"></i> ${denoFmt}</span>
+            <span class="pay-month"><i class="fas fa-location-dot"></i> ${row.address || '—'}</span>
+          </div>
+        </div>
+        <div class="pay-right">${badge('formality', row.status)}</div>
+      </div>`;
+    }
+    function rowFormality(row) {
+      const denoFmt = row.deno ? Number(row.deno).toLocaleString('en-IN') : '—';
+      return `<tr onclick="openModal('formality',${row._idx})">
+        <td class="cbc" onclick="event.stopPropagation()"><input type="checkbox" class="rcb ecb-formality" data-i="${row._idx}" onclick="syncBulk('formality')"></td>
+        <td>${row.name || '—'}</td>
+        <td>${row.address || '—'}</td>
+        <td style="font-weight:600">${denoFmt}</td>
+        <td>${badge('formality', row.status)}</td>
+      </tr>`;
+    }
+    function cardDefault(row) {
+      const daysNum = Number(row.days) || 0;
+      const statusCls = daysNum >= 30 ? 's-cash' : daysNum >= 15 ? 's-online' : daysNum > 0 ? 's-prog' : 's-out';
+      const monthFmt = row.month ? fmt('month', row.month) : '—';
+      const denoFmt = row.deno ? '₹' + Number(row.deno).toLocaleString('en-IN') : '—';
+      return `<div class="pay-card ${statusCls}" onclick="openModal('default',${row._idx})">
+        <input type="checkbox" class="pay-cb ecb-default" data-i="${row._idx}" onclick="event.stopPropagation();syncBulk('default')">
+        <div class="pay-info">
+          <div class="pay-name"><i class="fas fa-user"></i> ${row.name || '—'}</div>
+          <div class="pay-details">
+            <span class="pay-amt"><i class="fas fa-calendar-days"></i> ${daysNum} days</span>
+            <span class="pay-month"><i class="fas fa-calendar"></i> ${monthFmt}</span>
+            <span class="pay-month"><i class="fas fa-indian-rupee-sign"></i> ${denoFmt}</span>
+          </div>
+        </div>
+        <div class="pay-right"><span class="sb s-prog">${row.address || '—'}</span></div>
+      </div>`;
+    }
+    function rowDefault(row) {
+      const daysNum = Number(row.days) || 0;
+      const monthFmt = row.month ? fmt('month', row.month) : '—';
+      const denoFmt = row.deno ? Number(row.deno).toLocaleString('en-IN') : '—';
+      return `<tr onclick="openModal('default',${row._idx})">
+        <td class="cbc" onclick="event.stopPropagation()"><input type="checkbox" class="rcb ecb-default" data-i="${row._idx}" onclick="syncBulk('default')"></td>
+        <td>${row.name || '—'}</td>
+        <td>${monthFmt}</td>
+        <td style="font-weight:700">${daysNum}</td>
+        <td style="font-weight:600">${denoFmt}</td>
+        <td>${row.address || '—'}</td>
+      </tr>`;
+    }
+
+    if (tab === 'payments') {
+      const cards = rows.map(cardPayments).join('');
+      const tableRows = rows.map(rowPayments).join('');
+      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('payments',this)"></th><th>Name</th><th>Amount</th><th>Month</th><th>Status</th></tr>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+    } else if (tab === 'formality') {
+      const cards = rows.map(cardFormality).join('');
+      const tableRows = rows.map(rowFormality).join('');
+      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('formality',this)"></th><th>Name</th><th>Address</th><th>Deno</th><th>Status</th></tr>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+    } else if (tab === 'default') {
+      const cards = rows.map(cardDefault).join('');
+      const tableRows = rows.map(rowDefault).join('');
+      const thead = `<tr><th class="cbc"><input type="checkbox" class="rcb" onclick="toggleAll('default',this)"></th><th>Name</th><th>Month</th><th>Days</th><th>Deno</th><th>Address</th></tr>`;
+      body.innerHTML = `<div class="mobile-view">${cards}</div><div class="desktop-view"><div class="tbox"><div class="twrap"><table><thead>${thead}</thead><tbody>${tableRows}</tbody></table></div></div></div>`;
+    }
+
+    syncBulk(tab);
+  });
+}
+
+function filterTable(tab) { renderTable(tab); }
+
+// ── bulk / checkbox ───────────────────────────────────────────────────────────
+// Records render twice (mobile card + desktop table row), so count unique rows only
+function ecbIdx(tab, onlyChecked) {
+  const sel = `.ecb-${tab}` + (onlyChecked ? ':checked' : '');
+  const seen = new Set();
+  document.querySelectorAll(sel).forEach(cb => seen.add(cb.dataset.i));
+  return [...seen].map(Number);
+}
+
+function toggleAll(tab, master) {
+  const cbs = document.querySelectorAll(`.ecb-${tab}`);
+  const pill = document.querySelector(`#select-bar-${tab} .sel-all-pill`);
+  
+  if (!master) {
+    const allChecked = cbs.length > 0 && [...cbs].every(cb => cb.checked);
+    const newState = !allChecked;
+    cbs.forEach(cb => cb.checked = newState);
+    if (pill) pill.classList.toggle('active', newState);
+  } else {
+    cbs.forEach(cb => cb.checked = master.checked);
+    if (pill) pill.classList.toggle('active', master.checked);
+  }
+  syncBulk(tab);
+}
+
+function syncBulk(tab) {
+  const checked = ecbIdx(tab, true).length;
+  const total   = ecbIdx(tab, false).length;
+  const btn     = document.getElementById('bulk-'+tab);
+  if (btn) {
+    if (tab === 'archive') {
+      if (checked>0) { btn.classList.remove('hidden'); btn.innerHTML=`<i class="fas fa-rotate-left"></i> Restore (${checked})`; }
+      else btn.classList.add('hidden');
+    } else {
+      if (checked>0) { btn.classList.remove('hidden'); btn.innerHTML=`<i class="fas fa-trash"></i> Delete (${checked})`; }
+      else btn.classList.add('hidden');
+    }
+  }
+  if (tab === 'archive') {
+    const delBtn = document.getElementById('del-archive');
+    if (delBtn) {
+      if (checked>0) { delBtn.classList.remove('hidden'); delBtn.innerHTML=`<i class="fas fa-trash"></i> Delete (${checked})`; }
+      else delBtn.classList.add('hidden');
+    }
+  }
+  const abtn = document.getElementById('archive-'+tab);
+  if (abtn) {
+    if (checked>0) { abtn.classList.remove('hidden'); abtn.innerHTML=`<i class="fas fa-box-archive"></i> Archive (${checked})`; }
+    else abtn.classList.add('hidden');
+  }
+  const sa = document.getElementById('sa-'+tab);
+  if (sa) { sa.checked = total>0 && checked===total; sa.indeterminate = checked>0 && checked<total; }
+  if (tab === 'payments') {
+    const pill = document.querySelector('.sel-all-pill');
+    if (pill) pill.classList.toggle('active', total>0 && checked===total);
+  }
+  if (tab === 'archive') {
+    const pill = document.querySelector('#select-bar-archive .sel-all-pill');
+    if (pill) pill.classList.toggle('active', total>0 && checked===total);
+  }
+  if (tab === 'reminder') {
+    const pill = document.querySelector('#select-bar-reminder .sel-all-pill');
+    if (pill) pill.classList.toggle('active', total>0 && checked===total);
+  }
+}
+
+function archiveSelectedPayments() {
+  const indices = ecbIdx('payments', true);
+  if (!indices.length) return;
+  showConfirm('Archive Records?',`Move ${indices.length} payment record${indices.length>1?'s':''} to Archive? They can be restored later.`,()=>{
+    archivePayments(indices);
+    selectMode.payments = false;
+    const btn = document.getElementById('select-payments');
+    btn.innerHTML = '<i class="fas fa-check-double"></i> Select';
+    btn.classList.remove('btn-d');
+    btn.classList.add('btn-g');
+    document.getElementById('tb-payments').classList.remove('pay-select');
+    document.getElementById('select-bar-payments').classList.add('hidden');
+  });
+}
+
+// ── modal ─────────────────────────────────────────────────────────────────────
+function escAttr(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Fill Payments ▸ Name suggestions from saved Reminder records
+function fillNameSuggestions() {
+  const dl = document.getElementById('remnames');
+  if (!dl) return;
+  const seen = new Set();
+  const names = [];
+  (loadDB().reminder || []).forEach(r => {
+    const n = (r.name || '').trim();
+    if (n && !seen.has(n)) { seen.add(n); names.push(n); }
+  });
+  dl.innerHTML = names.map(n => `<option value="${escAttr(n)}"></option>`).join('');
+}
+
+function openModal(tab, editIdx=-1) {
+  const db     = loadDB();
+  const c      = CFG[tab];
+  const isEdit = editIdx > -1;
+  const data   = isEdit ? (db[tab][editIdx]||{}) : {};
+
+  if (tab === 'payments') fillNameSuggestions();
+
+  document.getElementById('m-title').textContent = isEdit ? 'Update Entry' : 'Add New Entry';
+  document.getElementById('eidx').value           = editIdx;
+  document.getElementById('m-del').classList.toggle('hidden', !isEdit);
+  document.getElementById('m-save').innerHTML     = isEdit
+    ? '<i class="fas fa-pen"></i> Update'
+    : '<i class="fas fa-save"></i> Save';
+
+  const ff = document.getElementById('ffields');
+  ff.dataset.tab = tab;
+  ff.innerHTML = c.fields.map(f => {
+    const val     = data[f.name]!==undefined ? data[f.name] : '';
+    let dispVal   = val;
+    if (f.format && dispVal && !isNaN(dispVal)) dispVal = Number(dispVal).toLocaleString('en-IN');
+    let inp='';
+    if (f.type==='select') {
+      inp=`<select name="${f.name}" class="finput sinput-select">${f.options.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+    } else if (f.type==='datalist') {
+      inp=`<input type="text" name="${f.name}" value="${escAttr(dispVal)}" list="${f.list}" class="finput" placeholder="${f.placeholder||'Select or type…'}"${f.required?' required':''}>`;
+    } else {
+      const ev = f.format ? ` oninput="formatNum(event)" inputmode="numeric"` : '';
+      inp=`<input type="${f.type}" name="${f.name}" value="${dispVal}" class="finput" required${ev}>`;
+    }
+    return `<div class="fg"><label>${f.label}</label>${inp}</div>`;
+  }).join('');
+
+  let datesHtml='';
+  if (isEdit) {
+    const opts={day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'};
+    const cDate = data.createdAt ? new Date(data.createdAt).toLocaleString('en-IN',opts) : '—';
+    const uDate = data.updatedAt ? new Date(data.updatedAt).toLocaleString('en-IN',opts) : '—';
+    datesHtml=`<div class="entry-dates">Added: ${cDate} &nbsp;&bull;&nbsp; Updated: ${uDate}</div>`;
+  }
+  document.getElementById('m-dates').innerHTML = datesHtml;
+  document.getElementById('ebk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('ebk').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function saveEntry(e) {
+  e.preventDefault();
+  const tab = document.getElementById('ffields').dataset.tab;
+  const idx = parseInt(document.getElementById('eidx').value);
+  const fd  = new FormData(e.target);
+  const db  = loadDB();
+  if (!db[tab]) db[tab] = [];
+  const existing = (idx>-1 && db[tab][idx]) ? db[tab][idx] : {};
+  const now = new Date().toISOString();
+  const obj = { ...existing, createdAt: existing.createdAt||now, updatedAt: now };
+  fd.forEach((v,k) => {
+    obj[k] = ['amount','deno','days'].includes(k) ? v.trim().replace(/,/g,'') : v.trim();
+  });
+  if (tab === 'reminder') {
+    if (!obj.id) obj.id = newRemId();
+    const pi = db.payments.findIndex(p => p.remId && p.remId === obj.id);
+    if (pi > -1) { db.payments[pi].name = obj.name || ''; db.payments[pi].updatedAt = now; }
+  }
+  if (idx>-1) { db[tab][idx]=obj; showToast('Entry updated ✓'); }
+  else        { db[tab].unshift(obj); showToast('Entry added ✓'); }
+  saveDB(db);
+  closeModal();
+  if (tab==='reminder')      renderReminder();
+  else if (currentTab===tab) renderTable(tab);
+  if (currentTab==='home')   renderHome();
+}
+
+// ── confirm / delete ──────────────────────────────────────────────────────────
+// ── password gate ─────────────────────────────────────────────────────────────
+const APP_PASSWORD = '123';
+let pwOnOk = null;
+
+function askPassword(desc, onOk) {
+  pwOnOk = onOk;
+  document.getElementById('p-desc').textContent = desc || 'Enter password to continue.';
+  document.getElementById('p-input').value = '';
+  document.getElementById('p-err').classList.add('hidden');
+  document.getElementById('pbk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('p-input').focus(), 50);
+}
+
+function closePassword() {
+  document.getElementById('pbk').classList.remove('open');
+  document.body.style.overflow = '';
+  pwOnOk = null;
+}
+
+function submitPassword() {
+  const inp = document.getElementById('p-input');
+  if ((inp.value || '').trim() === APP_PASSWORD) {
+    const cb = pwOnOk;
+    closePassword();
+    if (cb) cb();
+  } else {
+    document.getElementById('p-err').classList.remove('hidden');
+    inp.value = '';
+    inp.focus();
+  }
+}
+
+function showConfirm(title, desc, onOk, opts) {
+  opts = opts || {};
+  if (opts.lock) {
+    askPassword(opts.pwDesc || 'Enter password to continue.',
+      () => showConfirm(title, desc, onOk, { ...opts, lock: false }));
+    return;
+  }
+  document.getElementById('c-title').textContent = title;
+  document.getElementById('c-desc').textContent  = desc;
+  document.getElementById('c-icon').innerHTML    = `<i class="fas ${opts.icon || 'fa-triangle-exclamation'}"></i>`;
+  const ok = document.getElementById('c-ok');
+  ok.className = 'btn ' + (opts.okClass || 'btn-d');
+  ok.innerHTML = `<i class="fas ${opts.okIcon || 'fa-trash'}"></i> ${opts.okLabel || 'Delete'}`;
+  ok.onclick = ()=>{ onOk(); closeConfirm(); };
+  document.getElementById('cbk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeConfirm() {
+  document.getElementById('cbk').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function showExpiryModal(dateStr) {
+  document.getElementById('expiry-date').textContent = dateStr;
+  document.getElementById('expirybk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExpiryModal() {
+  document.getElementById('expirybk').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function triggerDelete() {
+  const tab = document.getElementById('ffields').dataset.tab;
+  const idx = parseInt(document.getElementById('eidx').value);
+  closeModal();
+  if (tab === 'payments') {
+    showConfirm('Archive Record?','Move this payment to Archive? It can be restored later.',()=>{
+      archivePayments([idx]);
+      if (currentTab===tab) renderTable(tab);
+      if (currentTab==='home') renderHome();
+    });
+  } else {
+    showConfirm('Delete Record?','This cannot be undone.',()=>{
+      const db = loadDB();
+      if (!db[tab]) db[tab] = [];
+      db[tab].splice(idx,1);
+      saveDB(db);
+      if (tab==='reminder')      renderReminder();
+      else if (currentTab===tab) renderTable(tab);
+      if (currentTab==='home')   renderHome();
+      showToast('Record deleted',true);
+    }, {lock:true});
+  }
+}
+
+function confirmBulk(tab) {
+  const idxs = ecbIdx(tab, true);
+  if (!idxs.length) return;
+  if (tab === 'payments') {
+    showConfirm(
+      'Archive Selected Records?',
+      `Move ${idxs.length} payment record${idxs.length>1?'s':''} to Archive? They can be restored later.`,
+      ()=>{
+        archivePayments(idxs);
+        renderTable(tab);
+        if (currentTab==='home') renderHome();
+      }
+    );
+  } else {
+    showConfirm(
+      'Delete Selected Records?',
+      `Remove ${idxs.length} record${idxs.length>1?'s':''}? This cannot be undone.`,
+      ()=>{
+        const db = loadDB();
+        idxs.sort((a,b)=>b-a).forEach(i=>db[tab].splice(i,1));
+        saveDB(db);
+        if (tab==='reminder') renderReminder(); else renderTable(tab);
+        if (currentTab==='home') renderHome();
+        showToast(`${idxs.length} record${idxs.length>1?'s':''} deleted`,true);
+      },
+      {lock:true}
+    );
+  }
+}
+
+// ── reminder ──────────────────────────────────────────────────────────────────
+let dragSrcIdx = null;
+let remDragGuard = 0;
+
+function remIsPaid(r) {
+  const deno = Number(String(r.deno || '').replace(/,/g, '')) || 0;
+  const rec  = Number(String(r.received || '').replace(/,/g, '')) || 0;
+  return rec > 0 && rec >= deno;
+}
+
+// Fully-paid reminder cards sink to the bottom of the list (order kept stable)
+function sortPaidLast(arr) {
+  const due = [], paid = [];
+  (arr || []).forEach(r => (remIsPaid(r) ? paid : due).push(r));
+  return due.concat(paid);
+}
+
+// ── monthly reset: on the 1st of each month paid cards uncheck + go back to their spot
+function monthKey(d) {
+  d = d instanceof Date ? d : new Date(d);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function resetMonthlyPaid() {
+  const db = loadDB();
+  const nowKey = monthKey(new Date());
+  const list = db.reminder || [];
+  const toReset = [];
+  let changed = false;
+  list.forEach((r, i) => {
+    if (!remIsPaid(r)) return;
+    if (!r.paidOn) { r.paidOn = new Date().toISOString(); changed = true; return; }
+    if (monthKey(r.paidOn) < nowKey)
+      toReset.push({ r, pos: Number.isFinite(+r.prePaidIdx) ? +r.prePaidIdx : i });
+  });
+  if (!toReset.length) { if (changed) saveDB(db); return; }
+  const set = new Set(toReset.map(x => x.r));
+  const rest = list.filter(r => !set.has(r));
+  toReset.sort((a, b) => a.pos - b.pos).forEach(({ r, pos }) => {
+    r.received = 0;
+    delete r.paidOn;
+    delete r.prePaidIdx;
+    rest.splice(Math.max(0, Math.min(pos, rest.length)), 0, r);
+  });
+  db.reminder = rest;
+  saveDB(db);
+  showToast(`New month: ${toReset.length} reminder${toReset.length > 1 ? 's' : ''} unchecked`);
+}
+
+function newRemId() {
+  return 'rm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+}
+
+function renderReminder() {
+  const db   = loadDB();
+  const list = document.getElementById('rem-list');
+  if (!list) return;
+  const items = db.reminder || [];
+  const filter = (((document.getElementById('s-reminder') || {}).value) || '').trim().toLowerCase();
+  let rows = items.map((r, i) => ({ ...r, _idx: i }));
+  if (filter) rows = rows.filter(r => Object.values(r).some(v => (v + '').toLowerCase().includes(filter)));
+
+  batchUpdate(() => {
+    if (!rows.length) {
+      list.innerHTML = `<div class="rem-empty"><i class="fas fa-bell"></i><p>${
+        filter ? 'No matching reminders.' : 'No reminders yet. Click New to add one.'}</p></div>`;
+      syncBulk('reminder');
+      return;
+    }
+    const canDrag = !filter && !selectMode.reminder;
+    list.innerHTML = rows.map(r => {
+      const i = r._idx;
+      const denoFmt = r.deno ? '₹' + Number(r.deno).toLocaleString('en-IN') : '';
+      const paid = remIsPaid(r);
+      const drag = canDrag && !paid;
+      const recFmt = r.received ? Number(r.received).toLocaleString('en-IN') : '';
+      const statusBadge = r.status === '1st'
+        ? `<span class="sb s-online">1st</span>`
+        : r.status === '2nd'
+        ? `<span class="sb s-prog">2nd</span>`
+        : `<span class="sb s-other">${r.status||'—'}</span>`;
+      const stCls = r.status === '1st' ? 's-online' : r.status === '2nd' ? 's-prog' : 's-other';
+      return `<div class="rem-card ${stCls}${paid ? ' paid' : ''}" ${drag ? 'draggable="true"' : ''} data-i="${i}"
+          onclick="onReminderClick(event,${i})"
+          ondragstart="remDragStart(event,${i})"
+          ondragover="remDragOver(event)"
+          ondragleave="remDragLeave(event)"
+          ondrop="remDrop(event,${i})"
+          ondragend="remDragEnd(event)">
+        <input type="checkbox" class="pay-cb ecb-reminder" data-i="${i}" onclick="event.stopPropagation();syncBulk('reminder')">
+        <span class="rh" onclick="event.stopPropagation()"><i class="fas fa-grip-vertical"></i></span>
+        <div class="pay-info">
+          <div class="pay-name"><i class="fas fa-user"></i><span class="rem-nm">${r.name||'—'}</span>${statusBadge}</div>
+          <div class="pay-details">
+            <span class="pay-amt"><i class="fas fa-indian-rupee-sign"></i> ${denoFmt||'—'}</span>
+            ${r.address ? `<span class="pay-month"><i class="fas fa-location-dot"></i> ${r.address}</span>` : ''}
+            ${recFmt ? `<span class="rem-recv"><i class="fas fa-circle-check"></i> Received ₹${recFmt}</span>` : ''}
+          </div>
+        </div>
+        <div class="pay-right">
+          <input type="checkbox" class="rem-tick" ${paid ? 'checked' : ''} title="${paid ? 'Paid' : 'Mark as paid'}"
+            onclick="event.stopPropagation();askTogglePaid(this,${i})">
+          ${paid ? `<span class="rem-paid"><i class="fas fa-circle-check"></i> Paid</span>` : ''}
+          <button class="ricn" onclick="event.stopPropagation();editReminder(${i})" title="Edit"><i class="fas fa-pen"></i></button>
+          <button class="ricn" onclick="event.stopPropagation();deleteReminder(${i})" title="Delete" style="color:var(--red)"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+    syncBulk('reminder');
+  });
+}
+
+function onReminderClick(e, idx) {
+  if (Date.now() - remDragGuard < 300) return;
+  if (selectMode.reminder) {
+    const cb = e.currentTarget.querySelector('.ecb-reminder');
+    if (cb) { cb.checked = !cb.checked; syncBulk('reminder'); }
+    return;
+  }
+  openReminderDetail(idx);
+}
+
+function remDragStart(e, idx) {
+  dragSrcIdx = idx;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function remDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function remDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function remDrop(e, targetIdx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (dragSrcIdx === null || dragSrcIdx === targetIdx) return;
+  const db = loadDB();
+  const arr = db.reminder;
+  const moved = arr.splice(dragSrcIdx, 1)[0];
+  arr.splice(targetIdx, 0, moved);
+  db.reminder = arr;
+  saveDB(db);
+  renderReminder();
+  showToast('Order saved ✓');
+}
+function remDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  dragSrcIdx = null;
+  remDragGuard = Date.now();
+}
+
+// ── reminder detail / payment tick ────────────────────────────────────────────
+let rdIdx = -1, rdDeno = 0;
+
+function openReminderDetail(idx) {
+  const db = loadDB();
+  const r = (db.reminder || [])[idx];
+  if (!r) return;
+  rdIdx = idx;
+  rdDeno = Number(String(r.deno || '').replace(/,/g, '')) || 0;
+  const statusBadge = r.status === '1st'
+    ? `<span class="sb s-online">1st</span>`
+    : r.status === '2nd'
+    ? `<span class="sb s-prog">2nd</span>`
+    : `<span class="sb s-other">${r.status || '—'}</span>`;
+  document.getElementById('rd-title').textContent = r.name || 'Reminder Details';
+  document.getElementById('rd-grid').innerHTML = `
+    <div class="rd-item"><div class="rd-lbl">Name</div><div class="rd-val">${r.name || '—'}</div></div>
+    <div class="rd-item"><div class="rd-lbl">Address</div><div class="rd-val">${r.address || '—'}</div></div>
+    <div class="rd-item"><div class="rd-lbl">Denomination</div><div class="rd-val">${rdDeno ? '₹' + rdDeno.toLocaleString('en-IN') : '—'}</div></div>
+    <div class="rd-item"><div class="rd-lbl">Status</div><div class="rd-val">${statusBadge}</div></div>`;
+  const opts = {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'};
+  document.getElementById('rd-dates').innerHTML = `<div class="entry-dates">Added: ${
+      r.createdAt ? new Date(r.createdAt).toLocaleString('en-IN', opts) : '—'} &nbsp;&bull;&nbsp; Updated: ${
+      r.updatedAt ? new Date(r.updatedAt).toLocaleString('en-IN', opts) : '—'}</div>`;
+  document.getElementById('remdetailbk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// Card tick → confirmation → fade + move to end (nothing goes to Payments)
+function askTogglePaid(cb, idx) {
+  const r = (loadDB().reminder || [])[idx];
+  if (!r) { cb.checked = false; return; }
+  const paid = remIsPaid(r);
+  const name = r.name || 'This record';
+  cb.checked = paid;   // revert until confirmed
+  const yes = { okLabel: 'Yes', okClass: 'btn-p', okIcon: 'fa-check' };
+  if (!paid) showConfirm('Mark as Paid?',
+    `${name} — card will fade and move to the end of the list.`,
+    () => applyPaid(idx, true), { ...yes, icon: 'fa-circle-check' });
+  else showConfirm('Mark as Pending?',
+    `${name} — card will return to the normal list.`,
+    () => applyPaid(idx, false), { ...yes, icon: 'fa-rotate-left' });
+}
+
+function applyPaid(idx, paid) {
+  const db = loadDB();
+  const r = (db.reminder || [])[idx];
+  if (!r) return;
+  const deno = Number(String(r.deno || '').replace(/,/g, '')) || 0;
+  r.received  = paid ? (deno > 0 ? deno : 1) : 0;
+  r.updatedAt = new Date().toISOString();
+  if (paid) { r.paidOn = new Date().toISOString(); r.prePaidIdx = idx; }
+  else { delete r.paidOn; delete r.prePaidIdx; }
+  saveDB(db);
+  renderReminder();
+  if (currentTab === 'home') renderHome();
+  showToast(paid ? 'Marked as paid ✓' : 'Marked as pending');
+}
+
+function rdDelete() {
+  const idx = rdIdx;
+  closeReminderDetail();
+  deleteReminder(idx);
+}
+
+function closeReminderDetail() {
+  document.getElementById('remdetailbk').classList.remove('open');
+  document.body.style.overflow = '';
+  rdIdx = -1;
+}
+
+// ── reminder excel import ─────────────────────────────────────────────────────
+function cleanNum(v) { return String(v == null ? '' : v).replace(/[^0-9.]/g, ''); }
+function normHeader(k) { return String(k).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+function pickCol(row, keys) {
+  for (const k in row) if (keys.includes(normHeader(k))) return row[k];
+  return '';
+}
+
+function parseDelimited(text) {
+  text = String(text).replace(/^\uFEFF/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const delim = first.split(';').length > first.split(',').length ? ';' : ',';
+  const rows = []; let row = []; let cell = ''; let q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i+1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else {
+      if (c === '"') q = true;
+      else if (c === delim) { row.push(cell); cell = ''; }
+      else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+      else if (c !== '\r') cell += c;
+    }
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  if (!rows.length) return [];
+  const head = rows.shift().map((h, i) => String(h).trim() || ('col' + i));
+  return rows
+    .filter(r => r.some(c => String(c).trim() !== ''))
+    .map(r => { const o = {}; head.forEach((h, i) => o[h] = r[i] !== undefined ? r[i] : ''); return o; });
+}
+
+function importRemindersExcel() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.xlsx,.xls,.csv';
+  inp.onchange = () => {
+    const file = inp.files && inp.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      let rows = [];
+      try {
+        if (typeof XLSX !== 'undefined') {
+          const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
+          rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+        } else {
+          rows = parseDelimited(new TextDecoder().decode(new Uint8Array(ev.target.result)));
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Could not read file', true);
+        return;
+      }
+      importReminderRows(rows);
+    };
+    reader.onerror = () => showToast('Could not read file', true);
+    reader.readAsArrayBuffer(file);
+  };
+  inp.click();
+}
+
+function importReminderRows(rows) {
+  const NAME_KEYS = ['name','customername','membername','holdername','accountname'];
+  const ADDR_KEYS = ['address','addr','location','place'];
+  const DENO_KEYS = ['deno','denomination','amount','total','deposit','due'];
+  const STAT_KEYS = ['status','reminderstatus','reminder','type'];
+  const RECV_KEYS = ['paymentreceived','paymentrecv','received','paid','payment'];
+
+  const clean = (rows || []).filter(r => String(pickCol(r, NAME_KEYS)).trim() !== '');
+  if (!clean.length) { showToast('No valid rows found in file', true); return; }
+
+  const db = loadDB();
+  if (!db.reminder) db.reminder = [];
+  const now = new Date().toISOString();
+  let added = 0;
+  clean.forEach(r => {
+    const s = String(pickCol(r, STAT_KEYS)).trim().toLowerCase();
+    let st = '1st';
+    if (s === '2nd' || s === '2' || s.startsWith('2') || s.includes('second')) st = '2nd';
+    db.reminder.push({
+      id      : newRemId(),
+      name    : String(pickCol(r, NAME_KEYS)).trim(),
+      address : String(pickCol(r, ADDR_KEYS)).trim(),
+      deno    : cleanNum(pickCol(r, DENO_KEYS)),
+      status  : st,
+      received: cleanNum(pickCol(r, RECV_KEYS)),
+      createdAt: now,
+      updatedAt: now
+    });
+    added++;
+  });
+  if (!added) { showToast('No valid rows found in file', true); return; }
+  saveDB(db);
+  renderReminder();
+  if (currentTab === 'home') renderHome();
+  showToast(`${added} reminder${added > 1 ? 's' : ''} imported ✓`);
+}
+
+function openReminderModal(editIdx=-1) {
+  const db     = loadDB();
+  const isEdit = editIdx > -1;
+  const data   = isEdit ? (db.reminder[editIdx]||{}) : {};
+  document.getElementById('m-title').textContent = isEdit ? 'Update Reminder' : 'Add Reminder';
+  document.getElementById('eidx').value           = editIdx;
+  document.getElementById('m-del').classList.toggle('hidden', !isEdit);
+  document.getElementById('m-save').innerHTML     = isEdit
+    ? '<i class="fas fa-pen"></i> Update'
+    : '<i class="fas fa-save"></i> Save';
+  const ff = document.getElementById('ffields');
+  ff.dataset.tab = 'reminder';
+  const fields = [
+    {name:'name',   label:'Name',         type:'text'},
+    {name:'address',label:'Address',      type:'text'},
+    {name:'deno',   label:'Denomination', type:'text', format:true},
+    {name:'status', label:'Status',       type:'select', options:['1st','2nd']}
+  ];
+  ff.innerHTML = fields.map(f => {
+    const val = data[f.name]!==undefined ? data[f.name] : '';
+    let dispVal = val;
+    if (f.format && dispVal && !isNaN(dispVal)) dispVal = Number(dispVal).toLocaleString('en-IN');
+    let inp='';
+    if (f.type==='select') {
+      inp=`<select name="${f.name}" class="finput sinput-select">${f.options.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}</select>`;
+    } else {
+      const ev = f.format ? ` oninput="formatNum(event)" inputmode="numeric"` : '';
+      inp=`<input type="${f.type}" name="${f.name}" value="${dispVal}" class="finput" required${ev}>`;
+    }
+    return `<div class="fg"><label>${f.label}</label>${inp}</div>`;
+  }).join('');
+  let datesHtml='';
+  if (isEdit) {
+    const opts={day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'};
+    const cDate = data.createdAt ? new Date(data.createdAt).toLocaleString('en-IN',opts) : '—';
+    const uDate = data.updatedAt ? new Date(data.updatedAt).toLocaleString('en-IN',opts) : '—';
+    datesHtml=`<div class="entry-dates">Added: ${cDate} &nbsp;&bull;&nbsp; Updated: ${uDate}</div>`;
+  }
+  document.getElementById('m-dates').innerHTML = datesHtml;
+  document.getElementById('ebk').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function editReminder(idx)   { openReminderModal(idx); }
+
+function deleteReminder(idx) {
+  showConfirm('Delete Reminder?','This cannot be undone.',()=>{
+    const db = loadDB();
+    db.reminder.splice(idx,1);
+    saveDB(db);
+    renderReminder();
+    showToast('Reminder deleted',true);
+  }, {lock:true});
+}
+
+// ── archive ──────────────────────────────────────────────────────────────────
+function archivePayments(indices) {
+  const db = loadDB();
+  const toArchive = [];
+  indices.sort((a,b)=>b-a).forEach(i=>{
+    const rec = db.payments[i];
+    if (rec) {
+      rec.archivedAt = new Date().toISOString();
+      toArchive.push(rec);
+      db.payments.splice(i,1);
+    }
+  });
+  db.archive = (db.archive||[]).concat(toArchive);
+  saveDB(db);
+  renderTable('payments');
+  showToast(`${toArchive.length} record${toArchive.length>1?'s':''} archived ✓`);
+}
+
+function restoreArchive(idx) {
+  showConfirm('Restore Record?','Move this record back to Payments?',()=>{
+    const db = loadDB();
+    const rec = (db.archive||[])[idx];
+    if (!rec) return;
+    delete rec.archivedAt;
+    db.payments.unshift(rec);
+    db.archive.splice(idx,1);
+    saveDB(db);
+    renderArchive();
+    showToast('Record restored ✓');
+  });
+}
+
+function restoreAllArchive() {
+  const db = loadDB();
+  const items = db.archive || [];
+  if (!items.length) return;
+  showConfirm('Restore All?',`Restore ${items.length} archived record${items.length>1?'s':''} to Payments?`,()=>{
+    items.forEach(r=>{ delete r.archivedAt; db.payments.unshift(r); });
+    db.archive = [];
+    saveDB(db);
+    renderArchive();
+    showToast('All records restored ✓');
+  });
+}
+
+function deleteArchive(idx) {
+  showConfirm('Delete Archived Record?','This cannot be undone.',()=>{
+    const db = loadDB();
+    db.archive.splice(idx,1);
+    saveDB(db);
+    renderArchive();
+    showToast('Archived record deleted',true);
+  }, {lock:true});
+}
+
+function confirmBulkArchive() {
+  const boxes = [...document.querySelectorAll('.ecb-archive:checked')];
+  if (!boxes.length) return;
+  const indices = boxes.map(cb => parseInt(cb.dataset.i));
+  showConfirm('Restore Records?',`Move ${indices.length} archived record${indices.length>1?'s':''} back to Payments?`,()=>{
+    const db = loadDB();
+    indices.sort((a,b)=>b-a).forEach(i=>{
+      const rec = (db.archive||[])[i];
+      if (rec) {
+        delete rec.archivedAt;
+        db.payments.unshift(rec);
+        db.archive.splice(i,1);
+      }
+    });
+    saveDB(db);
+    renderArchive();
+    resetArchiveSelectMode();
+    showToast(`${indices.length} record${indices.length>1?'s':''} restored ✓`);
+  });
+}
+
+function confirmBulkDeleteArchive() {
+  const boxes = [...document.querySelectorAll('.ecb-archive:checked')];
+  if (!boxes.length) return;
+  const indices = boxes.map(cb => parseInt(cb.dataset.i));
+  showConfirm('Delete Archived Records?',`Permanently delete ${indices.length} record${indices.length>1?'s':''}? This cannot be undone.`,()=>{
+    const db = loadDB();
+    indices.sort((a,b)=>b-a).forEach(i=>{
+      db.archive.splice(i,1);
+    });
+    saveDB(db);
+    renderArchive();
+    resetArchiveSelectMode();
+    showToast(`${indices.length} record${indices.length>1?'s':''} deleted`,true);
+  }, {lock:true});
+}
+
+function resetArchiveSelectMode() {
+  selectMode.archive = false;
+  const btn = document.getElementById('select-archive');
+  if (btn) {
+    btn.innerHTML = '<i class="fas fa-check-double"></i> Select';
+    btn.classList.remove('btn-d');
+    btn.classList.add('btn-g');
+  }
+  const list = document.getElementById('tb-archive');
+  if (list) list.classList.remove('pay-select');
+  const selBar = document.getElementById('select-bar-archive');
+  if (selBar) selBar.classList.add('hidden');
+  document.querySelectorAll('.ecb-archive').forEach(cb => cb.checked = false);
+}
+
+function renderArchive() {
+  const db = loadDB();
+  const body = document.getElementById('tb-archive');
+  if (!body) return;
+  const items = db.archive || [];
+  const filter = (document.getElementById('s-archive') || {}).value || '';
+  let rows = items.map((r,i)=>({...r,_idx:i}));
+  if (filter) {
+    const f = filter.toLowerCase();
+    rows = rows.filter(r=>Object.values(r).some(v=>(v+'').toLowerCase().includes(f)));
+  }
+  // newest archive on top
+  rows.sort((a,b) => (b.archivedAt ? new Date(b.archivedAt).getTime() : 0)
+                   - (a.archivedAt ? new Date(a.archivedAt).getTime() : 0)
+                   || b._idx - a._idx);
+
+  batchUpdate(() => {
+    const sumEl = document.getElementById('sum-archive');
+    if (sumEl) {
+      const total = (db.archive || []).length;
+      const totalAmt = (db.archive || []).reduce((a,r) => a + (Number((r.amount||'').replace(/,/g,''))||0), 0);
+      sumEl.innerHTML = `
+        <div class="ts-box ts-collect"><div class="ts-lbl">Total Archived</div><div class="ts-row"><span class="ts-count">${total}</span><span class="ts-sep">~</span><span class="ts-amt">₹${Number(totalAmt).toLocaleString('en-IN')}</span></div></div>`;
+    }
+
+    if (!rows.length) {
+      body.innerHTML = `<div class="pay-empty"><i class="fas fa-box-archive"></i>
+        <p>${filter?'No matching archived records.':'No archived records yet.'}</p></div>`;
+      return;
+    }
+    body.innerHTML = rows.map(row => {
+      const statusCls = row.status === 'Cash' ? 's-cash' : row.status === 'Online' ? 's-online' : row.status === 'Out' ? 's-out' : '';
+      const amtFmt = row.amount ? Number(row.amount).toLocaleString('en-IN') : '—';
+      const monthFmt = row.month ? fmt('month', row.month) : '—';
+      const archDate = row.archivedAt ? new Date(row.archivedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      
+      let expiryText = '';
+      let expiryCls = 'expiry-ok';
+      let expiryDateStr = '';
+      if (row.archivedAt) {
+        const arch = new Date(row.archivedAt);
+        const now = new Date();
+        
+        // Archive expiry: archivedAt + 6 months
+        const archiveExpiry = new Date(arch);
+        archiveExpiry.setMonth(archiveExpiry.getMonth() + 6);
+        
+        // Format date as DD-MMM-YYYY
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const day = String(archiveExpiry.getDate()).padStart(2, '0');
+        const mon = months[archiveExpiry.getMonth()];
+        const year = archiveExpiry.getFullYear();
+        expiryDateStr = `${day}-${mon}-${year}`;
+        
+        const diff = archiveExpiry - now;
+        
+        if (diff <= 0) {
+          expiryText = 'Expires today';
+          expiryCls = 'expiry-danger';
+        } else {
+          const totalDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+          
+          // Calculate months and remaining days more accurately
+          let calcDate = new Date(now);
+          let monthCount = 0;
+          while (true) {
+            const nextMonth = new Date(calcDate);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            if (nextMonth > archiveExpiry) break;
+            calcDate = nextMonth;
+            monthCount++;
+          }
+          const remDays = Math.floor((archiveExpiry - calcDate) / (1000 * 60 * 60 * 24));
+          
+          if (monthCount > 0 && remDays > 0) expiryText = `${monthCount}m ${remDays}d left`;
+          else if (monthCount > 0) expiryText = `${monthCount}m left`;
+          else expiryText = `${totalDays}d left`;
+          
+          if (totalDays <= 7) expiryCls = 'expiry-danger';
+          else if (totalDays <= 30) expiryCls = 'expiry-warn';
+          else if (totalDays <= 90) expiryCls = 'expiry-mid';
+        }
+      }
+      
+      return `<div class="pay-card ${statusCls}" style="opacity:0.75">
+        <input type="checkbox" class="pay-cb ecb-archive" data-i="${row._idx}" onclick="event.stopPropagation();syncBulk('archive')">
+        <div class="pay-info">
+          <div class="pay-name"><i class="fas fa-user"></i> ${row.name || '—'}</div>
+          <div class="pay-details">
+            <span class="pay-amt"><i class="fas fa-indian-rupee-sign"></i> ${amtFmt}</span>
+            <span class="pay-month"><i class="fas fa-calendar"></i> ${monthFmt}</span>
+            <span class="pay-month"><i class="fas fa-box-archive"></i> ${archDate}</span>
+          </div>
+        </div>
+        <div class="archive-expiry ${expiryCls}" onclick="showExpiryModal('${expiryDateStr}')" style="cursor:pointer">
+          <i class="fas fa-clock"></i> ${expiryText}
+        </div>
+        <div class="pay-right">
+          ${badge('payments', row.status)}
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+function autoArchiveOldRecords() {
+  const db = loadDB();
+  const now = new Date();
+  
+  // Auto-archive payments older than 6 months
+  const sixMonthsAgo = new Date(now);
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const toArchive = [];
+  db.payments = db.payments.filter((r,i)=>{
+    const created = r.createdAt ? new Date(r.createdAt) : null;
+    if (created && created < sixMonthsAgo) {
+      r.archivedAt = r.updatedAt || r.createdAt || now.toISOString();
+      toArchive.push(r);
+      return false;
+    }
+    return true;
+  });
+  if (toArchive.length) {
+    db.archive = (db.archive||[]).concat(toArchive);
+    showToast(`Auto-archived ${toArchive.length} old record${toArchive.length>1?'s':''}`);
+  }
+  
+  // Auto-delete archived records older than 6 months
+  const archive = db.archive || [];
+  let deletedCount = 0;
+  db.archive = archive.filter(r => {
+    const archDate = r.archivedAt ? new Date(r.archivedAt) : null;
+    if (!archDate) return true;
+    const expiry = new Date(archDate);
+    expiry.setMonth(expiry.getMonth() + 6);
+    if (now >= expiry) {
+      deletedCount++;
+      return false;
+    }
+    return true;
+  });
+  if (deletedCount) {
+    showToast(`Auto-deleted ${deletedCount} expired archive record${deletedCount>1?'s':''}`, true);
+  }
+  
+  if (toArchive.length || deletedCount) saveDB(db);
+}
+
+// ── toast ─────────────────────────────────────────────────────────────────────
+let tTimer;
+function showToast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  document.getElementById('t-msg').textContent = msg;
+  document.getElementById('t-icon').className  = isErr ? 'fas fa-trash-can' : 'fas fa-check-circle';
+  t.className = 'toast show'+(isErr?' err':'');
+  clearTimeout(tTimer);
+  tTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── close on backdrop click ───────────────────────────────────────────────────
+// Modals only close via buttons — backdrop click is intentionally disabled
+
+// ── init ──────────────────────────────────────────────────────────────────────
+resetMonthlyPaid();
+(function sinkPaidReminders() {
+  const db = loadDB();
+  const sorted = sortPaidLast(db.reminder);
+  if (sorted.some((r, i) => r !== db.reminder[i])) { db.reminder = sorted; saveDB(db); }
+})();
+autoArchiveOldRecords();
+renderHome();
+</script>
+</body>
+</html>
