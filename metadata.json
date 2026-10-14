@@ -1,0 +1,6 @@
+{
+  "name": "DOP Agent",
+  "description": "Offline manager for India Post DOP RD agents to view customer accounts, installment due dates, and securely import portal tables.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
